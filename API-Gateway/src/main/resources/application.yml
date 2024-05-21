@@ -1,0 +1,58 @@
+server:
+  port: 8888
+spring:
+  application:
+    name: Service-Gateway
+  cloud:
+    # Gateway服务注册到nacos，用来发现nacos中其它服务(2.增强版)
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+    # 配置Gateway
+    gateway:
+      # 让Gateway服务可以发现nacos中注册的服务(2.增强版)：自带负载均衡
+      discovery:
+        locator:
+          enabled: true
+      # List集合属性配置：使用- 开头
+      # 配置路由List(路由：指定请求满足什么条件时转发到哪个微服务)
+      # (3.简写版：删除routes内容，访问时直接使用服务ID；请求url:http://localhost:8888/服务ID/资源名+参数)
+      routes:
+        # 商品服务路由（网关限流配置: /flowLimiter/*）
+        - id: r-GoodsService
+          uri: lb://Service-Goods  # lb：手动开启负载均衡
+          order: 0
+          predicates:
+            - Path=/GoodsService/**
+          filters:
+            - StripPrefix=1
+        # 订单服务路由
+        - id: r-OrderService  # 路由的唯一标识
+          # 开启一个服务(1.基础版)
+          # uri: http://localhost:8869  # 请求满足条件时转发到的微服务地址
+          # 开启多个服务(2.增强版)
+          uri: lb://Service-Order  # lb:LoadBalance 在nacos中根据服务ID发现服务并支持负载均衡
+          order: 0  # 优先级：数字越小优先级别越高
+          # 断言List(请求需要满足的条件，所有条件都需要满足)
+          predicates:
+            # url=uri(协议+IP+Port)+Path路径
+            # ①内置路由断言工厂
+            - Path=/OrderService/**  # 路径规则
+            - Method=GET  # 请求方式规则
+            - After=2022-12-10T00:00:00.000+08:00  # 限制请求时间在该日期之后
+            # ②自定义路由断言工厂(/predicates/AgeRoutePredicateFactory.java)
+            - Age=18,60  # 限定年龄在18~60间
+          # 过滤器List(请求在进行路由时先通过过滤器进行一定的修改)
+          filters:
+            # ①内置局部过滤器工厂
+            - StripPrefix=1  # 路由/转发前剔除路径上1层
+            - SetStatus=2000  # 修改响应状态码
+            # ②自定义局部过滤器工厂(/filters/LogGatewayFilterFactory.java)
+            - Log=true,false # 控制台日志和缓存日志是否开启
+
+            # 全局过滤器(作用于所有路由，yml中不用配置)
+            # 鉴权：/filters/AuthGlobalFilter.java
+
+# filters:StripPrefix=1作用
+# http://localhost:8869/OrderService/save?gId=10
+# http://localhost:8869/save?gId=10

@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: Service-Order
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/day1209_alicloud_shop?serverTimezone=UTC
+    username: root
+    password: 123456
+  jpa:
+    hibernate:
+      ddl-auto: update
+  # Nacos注册中心地址
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        # 负载均衡加权(weight默认1)
+        # weight: 2
+
+    # 配置Sentinel控制台(一个Spring Boot服务)通信端口和服务注册地址
+    sentinel:
+      transport:
+        # 与控制台服务通信的端口(任意配置)
+        port: 9999
+        # 控制台服务地址
+        dashboard: localhost:8080
+
+server:
+  port: 8869
+
+  # 高并发下的压力测试
+  # 设置Tomcat的最大线程数(默认为200)
+  tomcat:
+    threads:
+      max: 10
+
+# 配置其它负载均衡策略(spring cloud alibaba 2.2.x版本)
+
+# 服务提供/生产者名称
+Service-Goods:
+  ribbon:
+    # 负载均衡的顶层接口为：com.netflix.loadbalancer.IRule
+    # RandomRule: 随机选择一个server
+    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule

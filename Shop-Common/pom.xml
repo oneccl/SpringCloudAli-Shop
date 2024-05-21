@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--公共模块：包含项目所需依赖，其它模块(微服务)可引入本模块-->
+
+    <!--指定父项目，导入父项目的依赖-->
+    <parent>
+        <artifactId>SpringCloudAli-Shop</artifactId>
+        <groupId>com.cc</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <!--模块(子项目)版本-->
+    <artifactId>Shop-Common</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>Shop-Common</name>
+    <description>Demo project for Spring Boot</description>
+
+    <properties>
+        <java.version>1.8</java.version>
+    </properties>
+
+    <!--继承父项目的依赖-->
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!--添加Json格式转换依赖，Spring Boot Ali默认生成的版本-->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.72</version>
+        </dependency>
+        <!--导入Mysql驱动需要根据本地应用指定版本-->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.28</version>
+            <!--optional标签：true：引入本模块不允许调用该jar依赖-->
+            <!--<optional>true</optional>-->
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!--Spring-Cloud-Ali-2021版的acos没有ribbon集成，因此需要引入loadbalancer依赖-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-loadbalancer</artifactId>-->
+<!--        </dependency>-->
+
+        <!--Spring-Cloud-Ali注册中心组件Nacos客户端依赖（Shop-Goods、Shop-Order）-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+            <!--exclusion：可以解决版本冲突问题，表示使用当前artifactId中包含的依赖-->
+            <!--使用spring cloud alibaba的nacos(部分版本)需要排除其中的ribbon包，nacos中ribbon会导致loadbalancer失效-->
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.springframework.cloud</groupId>-->
+<!--                    <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
+        </dependency>
+
+        <!--
+        Spring-Cloud-Ali服务调用组件Feign（Shop-Order）
+        Nacos很好的兼容了Feign，Feign(2.2.x版本)集成了负载均衡Ribbon，使得调用远程服务就像调用本地服务一样
+        -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+
+        <!--Spring-Cloud-Ali服务容错组件(Sentinel的Java客户端依赖)（Shop-Order）-->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

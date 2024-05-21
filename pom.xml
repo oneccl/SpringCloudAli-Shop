@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <!--基于Spring Cloud Alibaba微服务架构项目的开发-->
+
+    <!--父项目：Maven工程(默认打包方式：jar) 子项目：Spring Boot Ali(默认打包方式：jar)-->
+    <!--将每个SpringBoot子项目(微服务)pom文件中的父版本引入抽取移入maven(父项目)中-->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.3.7.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <!--Maven项目版本-->
+    <groupId>com.cc</groupId>
+    <artifactId>SpringCloudAli-Shop</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <!--模块(不写module子模块/服务无法继承公共版本中的依赖)-->
+    <modules>
+        <module>Shop-Common</module>
+        <module>Shop-User</module>
+        <module>Shop-Goods</module>
+        <module>Shop-Order</module>
+        <module>API-Gateway</module>
+    </modules>
+
+    <!--父项目定义统一的打包方式/依赖类型-->
+    <!--子项目打包前，父项目先打包，指定父项目的打包方式为：pom(与子项目统一)-->
+    <packaging>pom</packaging>
+
+    <!--
+    Spring Boot 2.4.x版本和2.4以下版本间变化较大
+    spring boot 2.4.x使用的spring cloud ali变为2021.x分支(nacos取消集成ribbon)
+    spring boot 2.4以下使用的spring cloud ali为2.2.x分支(nacos内集成ribbon)
+    兼容问题：  SpringBoot  和  SpringCloud  和  SpringCloudAlibaba
+    2.4+版本： 2.4.2           2020.0.x         2021.1
+    2.4以下：  2.3.7.RELEASE   Hoxton.SR9       2.2.6.RELEASE
+    -->
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+
+        <spring-boot.version>2.3.7.RELEASE</spring-boot.version>
+        <spring-cloud.version>Hoxton.SR9</spring-cloud.version>
+        <spring-cloud-alibaba.version>2.2.6.RELEASE</spring-cloud-alibaba.version>
+    </properties>
+
+    <!--dependencyManagement: 定义一个统一的初始版本，统一管理-->
+    <dependencyManagement>
+        <dependencies>
+            <!--SpringBoot公共版本定义：子项目使用SpringBoot-->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <!--type：打包方式/依赖的类型(相当于文件的后缀)，默认为jar-->
+                <type>pom</type>
+                <!--import：代表子模块将父模块中的jar依赖导入进来-->
+                <scope>import</scope>
+            </dependency>
+            <!--SpringCloud公共版本定义：SpringCloud Alibaba基于SpringCloud，因此需要导入-->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!--SpringCloud Alibaba公共版本定义-->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>
